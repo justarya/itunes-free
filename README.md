@@ -1,4 +1,4 @@
-# simple-itunes
+# iTunes Free
 
 ## Build Setup
 
