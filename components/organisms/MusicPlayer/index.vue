@@ -63,13 +63,16 @@ export default {
     },
     isPlaying: {
       handler(isPlaying) {
+        const audio = this.$refs.player;
         // prevent starting multiple listeners at the same time
         if (isPlaying && !this.listenerActive) {
-          const audio = this.$refs.player;
           this.listenerActive = true;
           // for a more consistent timeupdate, include freqtimeupdate.js and
           // replace both instances of 'timeupdate' with 'freqtimeupdate'
           audio.addEventListener('timeupdate', this.playbackListener);
+          this.toggleAudio();
+        } else {
+          audio.pause();
         }
       },
     },
@@ -80,14 +83,13 @@ export default {
 
       if (audio.paused) {
         audio.play();
-        this.$store.dispatch('player/playAudio', true);
+        this.$store.dispatch('player/setPlayStatus', true);
       } else {
         audio.pause();
-        this.$store.dispatch('player/playAudio', false);
+        this.$store.dispatch('player/setPlayStatus', false);
       }
     },
     async startAudio() {
-      // this.endListener();
       const audio = this.$refs.player;
       this.endListener();
 
@@ -105,12 +107,10 @@ export default {
       audio.addEventListener('pause', this.pauseListener);
     },
     pauseListener() {
-      this.$store.dispatch('player/playAudio', false);
       this.listenerActive = false;
       this.cleanupListeners();
     },
     endListener() {
-      this.$store.dispatch('player/playAudio', false);
       this.listenerActive = false;
       this.cleanupListeners();
     },
@@ -135,6 +135,7 @@ export default {
   bottom: 0;
   display: flex;
   width: 100%;
+  max-width: 450px;
   background-color: black;
   color: white;
   border-top-left-radius: 8px;
@@ -143,6 +144,7 @@ export default {
   &__cover {
     padding: 16px;
     img {
+      border-radius: 8px;
       width: 72px;
     }
   }

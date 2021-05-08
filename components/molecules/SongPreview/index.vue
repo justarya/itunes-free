@@ -78,17 +78,27 @@ export default {
       return this.$store.getters['player/songDetail'].id === this.id
         && this.$store.getters['player/isPlaying'];
     },
+    isThisSongPaused() {
+      return this.$store.getters['player/songDetail'].id === this.id
+        && !this.$store.getters['player/isPlaying'];
+    },
   },
   methods: {
     playSong() {
-      this.$store.dispatch('player/playSong', {
-        id: this.id,
-        coverUrl: this.coverUrl,
-        songTitle: this.songTitle,
-        artistName: this.artistName,
-        albumName: this.albumName,
-        previewUrl: this.previewUrl,
-      });
+      if (this.isThisSongPlaying) {
+        this.$store.dispatch('player/setPlayStatus', false);
+      } else if (this.isThisSongPaused) {
+        this.$store.dispatch('player/setPlayStatus', true);
+      } else {
+        this.$store.dispatch('player/playSong', {
+          id: this.id,
+          coverUrl: this.coverUrl,
+          songTitle: this.songTitle,
+          artistName: this.artistName,
+          albumName: this.albumName,
+          previewUrl: this.previewUrl,
+        });
+      }
     },
   },
 };
@@ -105,8 +115,11 @@ export default {
   display: flex;
   padding: 8px 12px;
   cursor: pointer;
+  transition: 0.1s;
+  border-radius: 10px;
 
   &:hover {
+    transition: 0.1s;
     background-color: #eee;
   }
 

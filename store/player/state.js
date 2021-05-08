@@ -1,4 +1,4 @@
-export default {
+export default () => ({
   status: '', // '', 'play', 'pause
   song: {
     id: '',
@@ -8,4 +8,4 @@ export default {
     albumName: '',
     previewUrl: '',
   },
-};
+});

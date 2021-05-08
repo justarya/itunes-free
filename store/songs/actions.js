@@ -8,7 +8,6 @@ export default {
         limit: 20,
         term,
         media: 'music',
-        // callback: 'wsSearchCB',
       },
     });
     const songs = data.results.map((el) => ({
