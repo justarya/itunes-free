@@ -34,13 +34,15 @@
       ref="player"
       style="display: none;"
     >
-      <source :src="song.previewUrl" type="audio/mp3">
+      <source type="audio/mp3">
       Your browser does not support the audio tag.
     </audio>
   </div>
 </template>
 
 <script>
+import EventBus from '../../../plugins/event-bus';
+
 export default {
   name: 'MusicPlayer',
   data: () => ({
@@ -64,18 +66,18 @@ export default {
     isPlaying: {
       handler(isPlaying) {
         const audio = this.$refs.player;
-        // prevent starting multiple listeners at the same time
+
         if (isPlaying && !this.listenerActive) {
           this.listenerActive = true;
-          // for a more consistent timeupdate, include freqtimeupdate.js and
-          // replace both instances of 'timeupdate' with 'freqtimeupdate'
           audio.addEventListener('timeupdate', this.playbackListener);
-          this.toggleAudio();
         } else {
           audio.pause();
         }
       },
     },
+  },
+  mounted() {
+    EventBus.$on('TOGGLE_PLAYER', this.toggleAudio);
   },
   methods: {
     async toggleAudio() {
@@ -98,8 +100,6 @@ export default {
     },
     playbackListener() {
       const audio = this.$refs.player;
-      // Sync local 'playbackTime' var to audio.currentTime and update global state
-      this.playbackTime = audio.currentTime;
 
       // console.log("update: " + audio.currentTime);
       // Add listeners for audio pause and audio end events
@@ -107,10 +107,12 @@ export default {
       audio.addEventListener('pause', this.pauseListener);
     },
     pauseListener() {
+      this.$store.dispatch('player/setPlayStatus', false);
       this.listenerActive = false;
       this.cleanupListeners();
     },
     endListener() {
+      this.$store.dispatch('player/setPlayStatus', false);
       this.listenerActive = false;
       this.cleanupListeners();
     },

@@ -42,6 +42,8 @@
 </template>
 
 <script>
+import EventBus from '../../../plugins/event-bus';
+
 export default {
   name: 'SongPreview',
   props: {
@@ -85,10 +87,8 @@ export default {
   },
   methods: {
     playSong() {
-      if (this.isThisSongPlaying) {
-        this.$store.dispatch('player/setPlayStatus', false);
-      } else if (this.isThisSongPaused) {
-        this.$store.dispatch('player/setPlayStatus', true);
+      if (this.$store.getters['player/songDetail'].id === this.id) {
+        EventBus.$emit('TOGGLE_PLAYER');
       } else {
         this.$store.dispatch('player/playSong', {
           id: this.id,
